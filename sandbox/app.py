@@ -1,6 +1,7 @@
 from flask import Flask, request
 import math
 import json
+import random
 app = Flask(__name__)
 
 class Player:
@@ -11,18 +12,19 @@ class Player:
 		self.env = env
 		env.addPlayer(self)
 		self.distanceToJump = 0.2
+		self.dead = False
 		
-	def update(self, x, y, grounded):
+	def update(self, x, y, grounded, dead):
 		self.x = x
 		self.y = y
 		self.grounded = grounded 
-
+		self.dead = dead
 	def closestRightEdge(self):
 		platforms = sorted(self.env.platforms, key = lambda x : self.distanceToX(x.ur[0]) )
 		#print(self.env.platforms)
 		if platforms == []:
 			return math.inf
-		print(self.x) 
+		#print(self.x) 
 		return self.distanceToX(platforms[0].ur[0])
 
 	def distanceToX(self, x):
@@ -36,6 +38,13 @@ class Player:
 		return self.distanceToX(platforms[i])
 		
 	def nextMove(self):
+		''' Return a couple dirction, jump
+		Direction = 1 means right, -1 means left
+		Jump is a bool
+		'''
+		if (self.env.counter == 10):
+			return 0, 0
+		return random.randint(-1 , 2), int(random.random()<=0.5)
 		if (self.closestRightEdge() <= self.distanceToJump):
 			return 1, 1
 		return 1, 0
@@ -52,25 +61,34 @@ class Platform:
 		env.addPlatform(self)
 		
 class gameEnv:
-	def __init__(self):
+	def __init__(self, counter):
 		print("Reinitialized game environment")
 		self.players = []
 		self.platforms = []
-
+		self.counter = counter
+		
 	def addPlayer(self, player):
 		self.players.append(player)
 
 	def addPlatform(self, platform):
 		self.platforms.append(platform)
+	
+	def AllPlayersDead(self):
+		ret = True
+		for p in self.players:
+			if not p.dead:
+				ret = False
+		return ret
+		
+	def DoIReset(self):
+		return self.AllPlayersDead()
 
-
-
-env = gameEnv()
+env = gameEnv(0)
 
 @app.route('/hello')
 def hello():
 	global env
-	env = gameEnv()
+	env = gameEnv(env.counter + 1)
 	p = Player(env)
 	return "Hello mistress sexy bunny"
 	
@@ -80,7 +98,7 @@ def getmove():
 	jump = 0 means no jump, jump =1 means jump'''
 	global env
 	mv = env.players[0].nextMove()
-	print(mv)
+	#print(mv)
 	return json.dumps({'direction':mv[0], 'jump':mv[1]})
 
 @app.route('/sendenv', methods=['POST'])
@@ -95,11 +113,12 @@ def sendenv():
 	of each platform, in the form ULx eg. 
 	If they are 0, the platform doesn't exist'''
 	global env
+	print(env.counter)
 	info = request.get_json()
 	pinfo =  info[0]
-	
+	#print(info)
 	p = env.players[0]
-	p.update(pinfo["playerx"], pinfo["playery"], pinfo["grounded"])
+	p.update(pinfo["playerx"], pinfo["playery"], pinfo["grounded"], pinfo["dead"])
 
 	platinfo = info[1]["Items"]
 	env.platforms = []
@@ -113,6 +132,12 @@ def sendenv():
 	return json.dumps({"result":"success"})
 	
 
+@app.route('/reset')
+def reset():
+	global env
+	#print(env.DoIReset())
+	return str(env.DoIReset())
+	
 def index():
 	return 'Server Works!'
 
