@@ -22,7 +22,7 @@ public class spawnPlatform : MonoBehaviour
         topPlayerFinder = playerSpawner.GetComponent<spawnPlayer>();
         player = topPlayerFinder.topPlayer;
         spawnPlatformPosition = player.gameObject.transform.position;
-        SpawnPlatforms(0);
+        //SpawnPlatforms(0);
     }
 
     // Update is called once per frame

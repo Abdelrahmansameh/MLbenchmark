@@ -222,6 +222,7 @@ GameObject:
   - component: {fileID: 832080951}
   - component: {fileID: 832080952}
   - component: {fileID: 832080953}
+  - component: {fileID: 832080954}
   m_Layer: 0
   m_Name: _Scene
   m_TagString: _Scene
@@ -244,7 +245,7 @@ MonoBehaviour:
   platforms:
   - {fileID: 1969424939848940397, guid: ae5ee8629eecadd4d835588e1199e5fb, type: 3}
   spawnDistance: 20
-  gap: 8
+  gap: 6
   playerSpawner: {fileID: 832080948}
 --- !u!4 &832080950
 Transform:
@@ -288,7 +289,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   platforms: []
-  aiMode: 0
+  aiMode: 1
 --- !u!114 &832080953
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -307,6 +308,19 @@ MonoBehaviour:
     type: 3}
   numberOfPlayers: 1
   topPlayer: {fileID: 0}
+--- !u!114 &832080954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 832080948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a889d6e38cae5c43b84837d706e4f76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  reset: 0
 --- !u!1 &913011470
 GameObject:
   m_ObjectHideFlags: 0

@@ -24,12 +24,16 @@ public class PlayerControl : MonoBehaviour
     public Transform groundCheck;
     public float checkRadius;
     public LayerMask Ground;
-    
+
+    public bool Dead;
+    public float deadBarrier;
+
     private bool facingRight = true;
     // Start is called before the first frame update
     void Start()
     {
-        rigidbody = GetComponent<Rigidbody2D>();    
+        rigidbody = GetComponent<Rigidbody2D>();
+        Dead = false;
     }
 
     // Update is called once per frame
@@ -42,6 +46,7 @@ public class PlayerControl : MonoBehaviour
 	}
 	else
     {
+        
 	    mv = new controls();
 	    mv.direction = Input.GetAxis("Horizontal");
 	    if (Input.GetKeyDown(KeyCode.UpArrow))
@@ -59,6 +64,13 @@ public class PlayerControl : MonoBehaviour
         Move(mv.direction);
 
         Jump(mv.jump);
+
+        AmIDead();
+
+        if (Dead)
+        {
+            rigidbody.velocity = Vector2.zero;
+        }
     }
 
     void Move(float dir)
@@ -94,5 +106,17 @@ public class PlayerControl : MonoBehaviour
         //print(jsonResponse);
         controls info = JsonUtility.FromJson<controls>(jsonResponse);
         return info;
+    }
+
+    void AmIDead()
+    {
+        if (gameObject.transform.position.y <= deadBarrier)
+        {
+            Dead = true;
+        }
+        else
+        {
+            Dead = false;
+        }
     }
 }

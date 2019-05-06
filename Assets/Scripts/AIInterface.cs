@@ -41,12 +41,14 @@ public class playerInfo
     public float playerx;
     public float playery;
     public bool grounded;
+    public bool dead;
     
-    public playerInfo(float x, float y, bool g)
+    public playerInfo(float x, float y, bool g, bool d)
     {
         playerx = x;
         playery = y;
         grounded = g;
+        dead = d;
     }
 }
 
@@ -132,7 +134,7 @@ public class AIInterface : MonoBehaviour
 
     playerInfo getPlayerInfo()
     {
-        playerInfo ret = new playerInfo(player.transform.position.x, player.transform.position.y, player.GetComponent<PlayerControl>().Grounded);
+        playerInfo ret = new playerInfo(player.transform.position.x, player.transform.position.y, player.GetComponent<PlayerControl>().Grounded, player.GetComponent<PlayerControl>().Dead);
         return ret;
     }
 

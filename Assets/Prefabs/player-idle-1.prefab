@@ -161,6 +161,8 @@ MonoBehaviour:
   Ground:
     serializedVersion: 2
     m_Bits: 256
+  Dead: 0
+  deadBarrier: -20
 --- !u!50 &8153359907056128635
 Rigidbody2D:
   serializedVersion: 4
