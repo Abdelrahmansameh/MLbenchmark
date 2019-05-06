@@ -7,7 +7,7 @@ using System.IO;
 
 public class controls
 {
-    public int direction;
+    public float direction;
     public int jump;
 }
 
@@ -15,15 +15,16 @@ public class PlayerControl : MonoBehaviour
 {
     public float speed;
     public float jumpForce;
-    public float xinput;
-
+    public int id;
+    
     private Rigidbody2D rigidbody;
 
     public bool Grounded;
+    public bool aiMode; 
     public Transform groundCheck;
     public float checkRadius;
     public LayerMask Ground;
-
+    
     private bool facingRight = true;
     // Start is called before the first frame update
     void Start()
@@ -34,8 +35,25 @@ public class PlayerControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        controls mv = GetControls();
+	controls mv;
+	if(aiMode)
+    {
+        mv = GetControls();
+	}
+	else
+    {
+	    mv = new controls();
+	    mv.direction = Input.GetAxis("Horizontal");
+	    if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+		    mv.jump = 1;
+	    }
+	    else
+        {
+		    mv.jump = 0;
+	    }
 
+	}
         Grounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, Ground);
 
         Move(mv.direction);
@@ -43,9 +61,9 @@ public class PlayerControl : MonoBehaviour
         Jump(mv.jump);
     }
 
-    void Move(int dir)
+    void Move(float dir)
     {
-        int xinput = dir;
+        float xinput = dir;
         rigidbody.velocity = new Vector2(xinput * speed, rigidbody.velocity.y);
         if ((facingRight == false && xinput > 0) || (facingRight == true && xinput < 0))
         {
@@ -73,6 +91,7 @@ public class PlayerControl : MonoBehaviour
         HttpWebResponse response = (HttpWebResponse)request.GetResponse();
         StreamReader reader = new StreamReader(response.GetResponseStream());
         string jsonResponse = reader.ReadToEnd();
+        //print(jsonResponse);
         controls info = JsonUtility.FromJson<controls>(jsonResponse);
         return info;
     }

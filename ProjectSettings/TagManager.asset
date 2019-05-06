@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - platform
+  - _Scene
   layers:
   - Default
   - TransparentFX

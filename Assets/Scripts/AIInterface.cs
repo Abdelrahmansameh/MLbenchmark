@@ -80,20 +80,28 @@ public class platformInfo
 
 public class AIInterface : MonoBehaviour
 {
-    public GameObject player;
+    private GameObject player;
     public GameObject[] platforms;
-
+    public bool aiMode;
     // Start is called before the first frame update
     void Start()
     {
+        player = GameObject.FindGameObjectWithTag("Player");
+        Uri serverUri = new Uri("http://127.0.0.1:5000/hello");
+        var request = (HttpWebRequest)WebRequest.Create(serverUri);
+        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
     }
 
     // Update is called once per frame
     void Update()
     {
-            //getPlayerInfo();
-            //GetPlatforms();
-            sendEnv();
+        player = GameObject.FindGameObjectWithTag("Player");
+        //getPlayerInfo();
+        //GetPlatforms();
+        if (aiMode){
+	    	sendEnv();
+	    }
     }
     platformInfo[] GetPlatforms()
     {
@@ -141,7 +149,7 @@ public class AIInterface : MonoBehaviour
         string myJson2 = JsonHelper.ToJson(toSend2, true);
         string myJson = "[" + myJson1 + "," + myJson2 + "]";
 
-        var request = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:5000/testpost");
+        var request = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:5000/sendenv");
         request.ContentType = "application/json";
         request.Method = "POST";
 
@@ -153,6 +161,7 @@ public class AIInterface : MonoBehaviour
         var response = (HttpWebResponse)request.GetResponse();
         StreamReader reader = new StreamReader(response.GetResponseStream());
         string jsonResponse = reader.ReadToEnd();
+        //print(jsonResponse);
         return jsonResponse;
     }
 }

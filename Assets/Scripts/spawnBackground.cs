@@ -4,22 +4,27 @@ using UnityEngine;
 
 public class spawnBackground : MonoBehaviour
 {
-    public GameObject player;
+    private GameObject player;
     public GameObject background;
     public int spawnDistance;
-
+    private GameObject playerSpawner;
+    public spawnPlayer topPlayerFinder;
     private Vector3 spawnPlatformPosition;
 
 
     // Start is called before the first frame update
     void Start()
     {
+        playerSpawner = GameObject.FindGameObjectWithTag("_Scene");
+        topPlayerFinder = playerSpawner.GetComponent<spawnPlayer>();
+        player = topPlayerFinder.topPlayer;
         spawnPlatformPosition = player.gameObject.transform.position;
     }
 
     // Update is called once per frame
     void Update()
     {
+        player = topPlayerFinder.topPlayer;
         float distanceToSpawn = Vector3.Distance(player.gameObject.transform.position, spawnPlatformPosition);
         if (distanceToSpawn < spawnDistance)
         {

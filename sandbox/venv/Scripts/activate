@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="D:\Documents\Udemy\Machine Learning\sandbox\venv"
+VIRTUAL_ENV="C:\Users\Abdel\Documents\MLbenchmark\sandbox\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
