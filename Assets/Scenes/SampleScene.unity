@@ -222,7 +222,6 @@ GameObject:
   - component: {fileID: 832080951}
   - component: {fileID: 832080952}
   - component: {fileID: 832080953}
-  - component: {fileID: 832080954}
   m_Layer: 0
   m_Name: _Scene
   m_TagString: _Scene
@@ -308,19 +307,6 @@ MonoBehaviour:
     type: 3}
   numberOfPlayers: 1
   topPlayer: {fileID: 0}
---- !u!114 &832080954
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 832080948}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3a889d6e38cae5c43b84837d706e4f76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  reset: 0
 --- !u!1 &913011470
 GameObject:
   m_ObjectHideFlags: 0

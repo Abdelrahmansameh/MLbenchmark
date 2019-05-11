@@ -1,8 +1,15 @@
+'''
+RUN THESE BEFORE RUNNING SERVER
+> set FLASK_ENV=development
+> set FLASK_APP=app.py
+'''
+
 from flask import Flask, request
 import math
 import json
 import random
 app = Flask(__name__)
+import os
 
 class Player:
 	def __init__(self, env):
@@ -42,9 +49,11 @@ class Player:
 		Direction = 1 means right, -1 means left
 		Jump is a bool
 		'''
-		if (self.env.counter == 10):
-			return 0, 0
-		return random.randint(-1 , 2), int(random.random()<=0.5)
+		if self.env.DoIReset():
+			os.system('taskkill /f /t /im MachineLearning.exe')
+			os.system('"MachineLearning.exe"')
+		return 1,0
+		return random.randint(-1 , 1), int(random.random()<=0.5)
 		if (self.closestRightEdge() <= self.distanceToJump):
 			return 1, 1
 		return 1, 0
@@ -137,6 +146,13 @@ def reset():
 	global env
 	#print(env.DoIReset())
 	return str(env.DoIReset())
+	
+@app.route('/start')
+def start():
+	global env
+	env = gameEnv(0)
+	os.system('"MachineLearning.exe" ')
+	return "started game"
 	
 def index():
 	return 'Server Works!'
