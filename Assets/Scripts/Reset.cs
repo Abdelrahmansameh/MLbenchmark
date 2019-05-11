@@ -15,7 +15,8 @@ public class Reset : MonoBehaviour
      updatereset();
      if( reset )
      {
-       SceneManager.LoadScene( SceneManager.GetActiveScene().name );
+	   Resources.UnloadUnusedAssets();
+       SceneManager.LoadScene( "SampleScene");
      }
    }
    void updatereset()

@@ -13,6 +13,7 @@ public class spawnPlayer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Screen.fullScreen = !Screen.fullScreen;
         for (int i = 0; i < numberOfPlayers; i++)
         {
             
