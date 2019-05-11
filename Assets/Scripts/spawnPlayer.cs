@@ -16,7 +16,6 @@ public class spawnPlayer : MonoBehaviour
         Screen.fullScreen = !Screen.fullScreen;
         for (int i = 0; i < numberOfPlayers; i++)
         {
-            
            GameObject p = Instantiate(player, spawnPoint.transform.position, Quaternion.identity);
             //p.GetComponent<PlayerControl>().speed = i;
             p.GetComponent<PlayerControl>().id = i;

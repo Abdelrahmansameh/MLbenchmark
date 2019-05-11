@@ -42,13 +42,15 @@ public class playerInfo
     public float playery;
     public bool grounded;
     public bool dead;
+    public int id;
     
-    public playerInfo(float x, float y, bool g, bool d)
+    public playerInfo(float x, float y, bool g, bool d,int i)
     {
         playerx = x;
         playery = y;
         grounded = g;
         dead = d;
+        id = i;
     }
 }
 
@@ -82,13 +84,13 @@ public class platformInfo
 
 public class AIInterface : MonoBehaviour
 {
-    private GameObject player;
+    private GameObject[] players;
     public GameObject[] platforms;
     public bool aiMode;
     // Start is called before the first frame update
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player");
+        players = GameObject.FindGameObjectsWithTag("Player");
         Uri serverUri = new Uri("http://127.0.0.1:5000/hello");
         var request = (HttpWebRequest)WebRequest.Create(serverUri);
         HttpWebResponse response = (HttpWebResponse)request.GetResponse();
@@ -98,7 +100,7 @@ public class AIInterface : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        player = GameObject.FindGameObjectWithTag("Player");
+        players = GameObject.FindGameObjectsWithTag("Player");
         //getPlayerInfo();
         //GetPlatforms();
         if (aiMode){
@@ -134,7 +136,7 @@ public class AIInterface : MonoBehaviour
 
     playerInfo getPlayerInfo()
     {
-        playerInfo ret = new playerInfo(player.transform.position.x, player.transform.position.y, player.GetComponent<PlayerControl>().Grounded, player.GetComponent<PlayerControl>().Dead);
+        playerInfo ret = new playerInfo(player.transform.position.x, player.transform.position.y, player.GetComponent<PlayerControl>().Grounded, player.GetComponent<PlayerControl>().Dead, player.GetComponent<PlayerControl>().id);
         return ret;
     }
 

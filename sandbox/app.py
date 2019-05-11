@@ -52,8 +52,8 @@ class Player:
 		if self.env.DoIReset():
 			os.system('taskkill /f /t /im MachineLearning.exe')
 			os.system('"MachineLearning.exe"')
-		return 1,0
-		return random.randint(-1 , 1), int(random.random()<=0.5)
+		#return 1,0
+		#return random.randint(-1 , 1), int(random.random()<=0.5)
 		if (self.closestRightEdge() <= self.distanceToJump):
 			return 1, 1
 		return 1, 0
