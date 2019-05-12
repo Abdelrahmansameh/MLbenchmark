@@ -5,11 +5,10 @@ import numpy as np
 # n_h2  no. of units in hidden layer 2
 # n_y   no. of output units
 
-
 n_x = 4
 n_h = 9
 n_h2 = 15
-n_y = 1
+n_y = 6
 W1_shape = (n_h,n_x)
 W2_shape = (n_h2,n_h)
 W3_shape = (n_y,n_h2)
@@ -36,5 +35,5 @@ def forward_propagation(X, individual):
     Z2 = np.matmul(W2, A1)
     A2 = np.tanh(Z2)
     Z3 = np.matmul(W3, A2)
-    A3 = sigmoid(Z3)
+    A3 = softmax(Z3)
     return A3

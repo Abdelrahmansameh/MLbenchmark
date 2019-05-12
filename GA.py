@@ -1,5 +1,5 @@
 from random import choice, randint
-from run_Game import*
+from run_game import*
 
 def cal_pop_fitness(pop):
     # calculating the fitness value by playing a game with the given weights in chromosome
