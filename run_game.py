@@ -20,7 +20,7 @@ def run_game_with_ML(weights):
 
         # compute score
         if grounded:
-            score -= -1000
+            score -= 1000
         else:
             score += x
         # TODO: send the new move to the game and continue playing
