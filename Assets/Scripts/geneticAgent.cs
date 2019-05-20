@@ -31,8 +31,6 @@ public class geneticAgent : MonoBehaviour
     public void Initialize_Random(int x, int h, int h2, int y)
     {
         n_x = x;
-        print(n_x);
-
         n_h = h;
         n_h2 = h2;
         n_y = y;
@@ -40,10 +38,39 @@ public class geneticAgent : MonoBehaviour
         W1shape = new Tuple<int, int>(n_h, n_x);
         W2shape = new Tuple<int, int>(n_h2, n_h);
         W3shape = new Tuple<int, int>(n_y, n_h2);
-
+         
         W1 = Matrix<double>.Build.Random(W1shape.Item1, W1shape.Item2);
         W2 = Matrix<double>.Build.Random(W2shape.Item1, W2shape.Item2);
         W3 = Matrix<double>.Build.Random(W3shape.Item1, W3shape.Item2);
+
+        int num_weights = n_x * n_h + n_h * n_h2 + n_h2 * n_y;
+
+        individual = new double[num_weights];
+        int c = 0;
+        for (int i = 0; i < W1shape.Item1; i++)
+        {
+            for (int j = 0; j < W1shape.Item2; j++)
+            {
+                individual[c] = W1[i, j];
+                c++;
+            }
+        }
+        for (int i = 0; i < W2shape.Item1; i++)
+        {
+            for (int j = 0; j < W2shape.Item2; j++)
+            {
+                individual[c] = W2[i, j];
+                c++;
+            }
+        }
+        for (int i = 0; i < W3shape.Item1; i++)
+        {
+            for (int j = 0; j < W3shape.Item2; j++)
+            {
+                individual[c] = W3[i, j];
+                c++;
+            }
+        }
     }
 
     public void Initialize_unfold( double[] individual, int x, int h, int h2, int y)
@@ -53,19 +80,24 @@ public class geneticAgent : MonoBehaviour
         //print(_);
 
         n_x = x;
-        print(n_x);
+        //print(n_x);
         n_h = h;
         n_h2 = h2;
         n_y = y;
+
+        int num_weights = n_x * n_h + n_h * n_h2 + n_h2 * n_y;
+
         W1shape = new Tuple<int, int>(n_h, n_x);
         W2shape = new Tuple<int, int>(n_h2, n_h);
         W3shape = new Tuple<int, int>(n_y, n_h2);
 
-        //print(W1shape);
-        //print(W2shape);
-        //print(W3shape);
+        this.individual = individual;
+        
+            //print(W1shape);
+            //print(W2shape);
+            //print(W3shape);
 
-        W1 = Matrix<double>.Build.Dense(W1shape.Item1, W1shape.Item2);
+            W1 = Matrix<double>.Build.Dense(W1shape.Item1, W1shape.Item2);
         W2 = Matrix<double>.Build.Dense(W2shape.Item1, W2shape.Item2);
         W3 = Matrix<double>.Build.Dense(W3shape.Item1, W3shape.Item2);
 
@@ -74,29 +106,32 @@ public class geneticAgent : MonoBehaviour
         {
             for (int j = 0; j < W1shape.Item2; j++)
             {
-                W1[i, j] = individual[i * W1shape.Item1 + j]; 
+                W1[i, j] = individual[offset];
+                offset++;
             }
         }
-        offset = 1 + offset + (W1shape.Item1 - 1) * (W1shape.Item2 - 1);
-
+        print(W1);
+       // print(offset);
         for (int i = 0; i < W2shape.Item1; i++)
         {
             for (int j = 0; j < W2shape.Item2; j++)
             {
-
-                W2[i, j] = individual[offset + i * W2shape.Item1 + j];
+                W2[i, j] = individual[offset];
+                offset++;
             }
         }
-
-        offset = 1 + offset + (W2shape.Item1 - 1) * (W2shape.Item2 - 1);
+        print(W2);
+        // print(offset);
 
         for (int i = 0; i < W3shape.Item1; i++)
         {
             for (int j = 0; j < W3shape.Item2; j++)
             {
-                W2[i, j] = individual[offset + i * W3shape.Item1 + j];
+                W3[i, j] = individual[offset];
+                offset++;
             }
         }
+        print(W3);
     }
         // Update is called once per frame
         void Update()
@@ -109,12 +144,11 @@ public class geneticAgent : MonoBehaviour
                GameObject ULm;
                ULm = m.transform.Find("UL").gameObject;
                ULn = n.transform.Find("UL").gameObject;
-
-               if (Math.Abs(ULm.transform.position.x - gameObject.transform.position.x) <= Math.Abs(ULn.transform.position.x - gameObject.transform.position.x))
+               if (Math.Abs(ULm.transform.position.x - gameObject.transform.position.x) < Math.Abs(ULn.transform.position.x - gameObject.transform.position.x))
                {
                    return -1;
                }
-               else if (m.transform.position.x == n.transform.position.x)
+               else if (Math.Abs(ULm.transform.position.x - gameObject.transform.position.x) == Math.Abs(ULn.transform.position.x - gameObject.transform.position.x))
                {
                    return 0;
                }

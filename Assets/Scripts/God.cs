@@ -3,25 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.Distributions;
 using System;
-using System.Linq;
 
-public class CustomArray<T>
-{
-    public T[] GetColumn(T[,] matrix, int columnNumber)
-    {
-        return Enumerable.Range(0, matrix.GetLength(0))
-                .Select(x => matrix[x, columnNumber])
-                .ToArray();
-    }
 
-    public T[] GetRow(T[,] matrix, int rowNumber)
-    {
-        return Enumerable.Range(0, matrix.GetLength(1))
-                .Select(x => matrix[rowNumber, x])
-                .ToArray();
-    }
-}
 
 public class Population
 {
@@ -31,12 +16,13 @@ public class Population
     public int num_offsprings;
     public int num_weights;
 
-    public Population(int numplayer, GameObject[] population, int numparents, int numweights)
+    public Population(int numplayer, GameObject[] population, int numparents, int numweights, int parents)
     {
         num_players = numplayer;
         pop = population;
-        num_offsprings = num_players;
+        num_offsprings = numplayer;
         num_weights = numweights;
+        num_parents = parents;
     }
 
     GameObject[] select_mating_pool()
@@ -46,7 +32,7 @@ public class Population
         Array.Sort<GameObject>(pop, 
             delegate (GameObject m, GameObject n)
             {
-                if (m.transform.position.x <= n.transform.position.x)
+                if (m.transform.position.x < n.transform.position.x)
                 {
                     return 1;
                 }
@@ -73,20 +59,34 @@ public class Population
         {
             int i = random.Next(0, num_parents);
             int j = random.Next(0, num_parents);
-            if (i != j)
+            while(i == j)
             {
-                int crossover = random.Next(0, num_weights);
-                for (int gene = 0; gene < crossover; gene++)
-                {
-                    offsprings[counter, gene] = parents[i].GetComponent<geneticAgent>().individual[gene];
-                   
-                }
-                for (int gene = crossover; gene < num_weights; gene++)
-                {
-                    offsprings[counter, gene] = parents[j].GetComponent<geneticAgent>().individual[gene];
-
-                }
+                j = random.Next(0, num_parents);
             }
+            int crossover = random.Next(0, num_weights);
+            var normal = new Normal(0, 1);
+            for (int gene = 0; gene < crossover; gene++)
+            {
+                offsprings[counter, gene] = parents[i].GetComponent<geneticAgent>().individual[gene];
+                double tmp = normal.Sample();
+                if (UnityEngine.Random.Range(0f, 1f) < 0.3)
+                {
+                    offsprings[counter, gene] += tmp;
+                }
+                    
+            }
+            for (int gene = crossover; gene < num_weights; gene++)
+            {
+                offsprings[counter, gene] = parents[j].GetComponent<geneticAgent>().individual[gene];
+                double tmp = normal.Sample();
+                if (UnityEngine.Random.Range(0f, 1f) < 0.3)
+                {
+                    offsprings[counter, gene] += tmp;
+                }
+
+            }
+
+
         }
         return offsprings;
     }
@@ -112,9 +112,7 @@ public class God : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        print(n_x);
         num_weights = n_x * n_h + n_h * n_h2 + n_h2 * n_y;
-        print(num_weights);
         GameObject[] pop = new GameObject[pop_size];
         for (int i = 0; i < pop_size; i++)
         {
@@ -124,8 +122,7 @@ public class God : MonoBehaviour
             p.GetComponent<geneticAgent>().Initialize_Random(n_x, n_h, n_h2, n_y);
             pop[i] = p;
         }
-        print(pop);
-        current_pop = new Population(pop_size, pop, num_parents,num_weights);
+        current_pop = new Population(pop_size, pop, num_parents,num_weights, num_parents);
         gen_counter++;
     }
 
@@ -136,8 +133,9 @@ public class God : MonoBehaviour
         {
             if (AllDead())
             {
-
+                Debug.Log("Im gonna call the thing\n");
                 double[,] new_weights = current_pop.SexAndMutations();
+                Console.WriteLine("I called the thing \n");
                 GameObject[] pop = new GameObject[pop_size];
                 for (int i = 0; i < pop_size; i++)
                 {
@@ -151,6 +149,19 @@ public class God : MonoBehaviour
                     }
                     p.GetComponent<geneticAgent>().Initialize_unfold(tmp, n_x, n_h, n_h2, n_y);
                     pop[i] = p;
+
+                    }
+                    GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+                    foreach (GameObject p1 in players)
+                    {
+                    foreach (GameObject p2 in players)
+                    {
+                        Physics2D.IgnoreCollision(p1.GetComponent<BoxCollider2D>(), p2.GetComponent<BoxCollider2D>());
+                    }
+                    GameObject player = players[0];
+                    Vector3 spawnPlatformPosition = new Vector3(player.transform.position.x + 3, 0, 0);
+                    Instantiate(platform, spawnPlatformPosition, Quaternion.identity);
+                    gameObject.GetComponent<spawnPlatform>().Initialize();
                 }
 
                 foreach (GameObject p in current_pop.pop)
@@ -158,7 +169,7 @@ public class God : MonoBehaviour
                         print(p.GetComponent<PlayerControl>().Dead);
                         Destroy(p);
                 }
-                current_pop = new Population(pop_size, pop, num_parents, num_weights);
+                current_pop = new Population(pop_size, pop, num_parents, num_weights, num_parents);
                 gen_counter++;
             }
         }

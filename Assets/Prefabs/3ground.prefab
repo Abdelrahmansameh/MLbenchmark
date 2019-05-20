@@ -107,7 +107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cac8cf6d90327a04d86296a05346da1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyDistance: 15
+  destroyDistance: 10
 --- !u!1 &5228753803630566538
 GameObject:
   m_ObjectHideFlags: 0

@@ -36,6 +36,7 @@ public class spawnPlayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         topPlayer = findTopPlayer(); 
     }
 
