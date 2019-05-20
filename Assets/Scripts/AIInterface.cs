@@ -134,22 +134,27 @@ public class AIInterface : MonoBehaviour
         return ret;
     }
 
-    playerInfo getPlayerInfo()
+    playerInfo[] getPlayersInfo()
     {
-        playerInfo ret = new playerInfo(player.transform.position.x, player.transform.position.y, player.GetComponent<PlayerControl>().Grounded, player.GetComponent<PlayerControl>().Dead, player.GetComponent<PlayerControl>().id);
+        playerInfo[] ret = new playerInfo[players.Length];
+        int i = 0;
+        foreach (GameObject player in players){
+            ret[i] = new playerInfo(player.transform.position.x, player.transform.position.y, player.GetComponent<PlayerControl>().Grounded, player.GetComponent<PlayerControl>().Dead, player.GetComponent<PlayerControl>().id);
+            i++;
+        }
         return ret;
     }
 
     private string sendEnv()
     {
-        playerInfo toSend = getPlayerInfo();
+        playerInfo[] toSend = getPlayersInfo();
 
 
 
         platformInfo[] toSend2 = GetPlatforms();
 
 
-        string myJson1 = JsonUtility.ToJson(toSend);
+        string myJson1 = JsonHelper.ToJson(toSend, true);
         string myJson2 = JsonHelper.ToJson(toSend2, true);
         string myJson = "[" + myJson1 + "," + myJson2 + "]";
 

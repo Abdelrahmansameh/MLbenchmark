@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 8153359907056128638}
   - component: {fileID: 8153359907056128639}
   - component: {fileID: 8153359907056128635}
+  - component: {fileID: 3197982227751858781}
   m_Layer: 0
   m_Name: player-idle-1
   m_TagString: Player
@@ -184,3 +185,20 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &3197982227751858781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8153359907056128640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 571a590989d7ebd488fe8c818e5ce840, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  n_x: 0
+  n_h: 0
+  n_h2: 0
+  n_y: 0
+  individual: []

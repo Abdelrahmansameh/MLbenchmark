@@ -4,11 +4,22 @@ using UnityEngine;
 using System.Net;
 using System;
 using System.IO;
+using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.LinearAlgebra.Double;
 
 public class controls
 {
     public float direction;
     public int jump;
+}
+
+public class Info
+{
+    public int id;
+    public Info(int i)
+    {
+        id = i;
+    }
 }
 
 public class PlayerControl : MonoBehaviour
@@ -39,11 +50,20 @@ public class PlayerControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-	controls mv;
+	controls mv = new controls();
 	if(aiMode)
     {
-        mv = GetControls();
-	}
+            if (!Dead)
+            {
+                mv = GetControls();
+            }
+            else
+            {
+                mv = new controls();
+                mv.direction = 0;
+                mv.jump = 0;
+            }
+    }
 	else
     {
         
@@ -90,6 +110,7 @@ public class PlayerControl : MonoBehaviour
             rigidbody.velocity = Vector2.up * jumpForce;
         }
     }
+
     void Flip()
     {
         facingRight = !facingRight;
@@ -98,14 +119,18 @@ public class PlayerControl : MonoBehaviour
 
     controls GetControls()
     {
-        Uri serverUri = new Uri("http://127.0.0.1:5000/getmove");
-        var request = (HttpWebRequest)WebRequest.Create(serverUri);
-        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-        StreamReader reader = new StreamReader(response.GetResponseStream());
-        string jsonResponse = reader.ReadToEnd();
-        //print(jsonResponse);
-        controls info = JsonUtility.FromJson<controls>(jsonResponse);
-        return info;
+        controls ret = new controls();
+        ret.direction = 1;
+        Vector<double> foo = gameObject.GetComponent<geneticAgent>().output;
+        if (foo[0]> 0.5)
+        {
+            ret.jump = 1;
+        }
+        else
+        {
+            ret.jump = 0;
+        }
+        return ret;
     }
 
     void AmIDead()

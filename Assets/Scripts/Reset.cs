@@ -9,14 +9,21 @@ using System.Net;
 public class Reset : MonoBehaviour
 {
     public bool reset;
+    private GameObject scene;
     // Start is called before the first frame update
-   void Update ()
+
+    void Start()
+    {
+        scene = GameObject.FindGameObjectWithTag("_Scene");    
+    }
+
+    void Update ()
    {
+    
      updatereset();
      if( reset )
      {
-	   Resources.UnloadUnusedAssets();
-       SceneManager.LoadScene( "SampleScene");
+            scene.GetComponent<AIInterface>().aiMode = false;
      }
    }
    void updatereset()
