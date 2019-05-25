@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class spawnPlatform : MonoBehaviour
 {
@@ -25,13 +26,12 @@ public class spawnPlatform : MonoBehaviour
         playerSpawner = GameObject.FindGameObjectWithTag("_Scene");
         topPlayerFinder = playerSpawner.GetComponent<spawnPlayer>();
         player = topPlayerFinder.topPlayer;
-        spawnPlatformPosition = player.gameObject.transform.position;
+        spawnPlatformPosition = new Vector3(0, 0,0);
         //SpawnPlatforms(0);
     }
     // Update is called once per frame
     void Update()
     {
-        print(spawnPlatformPosition);
         player = topPlayerFinder.topPlayer;
         float distanceToSpawn = Vector3.Distance(player.gameObject.transform.position, spawnPlatformPosition);
         if (distanceToSpawn < spawnDistance)
@@ -42,9 +42,25 @@ public class spawnPlatform : MonoBehaviour
 
     void SpawnPlatforms(float g)
     {
+        System.Random random = new System.Random();
+        int foo = random.Next(0, 2);
+        if (spawnPlatformPosition == new Vector3(0, 0, 0))
+        {
+            foo = 0;
+        }
         spawnPlatformPosition = new Vector3(spawnPlatformPosition.x + g, 0, 0);
-        print(spawnPlatformPosition);
-        Instantiate(platforms[0], spawnPlatformPosition, Quaternion.identity);
+        //print(spawnPlatformPosition);
+        if (foo == 0)
+        {
+            Instantiate(platforms[0], spawnPlatformPosition, Quaternion.identity);
+        }
+        if (foo == 1){
+            GameObject plat = Instantiate(platforms[1], spawnPlatformPosition, Quaternion.identity);
+            GameObject block = plat.transform.Find("UpperBlock").gameObject;
+            print(block.transform.localPosition);
+            float ba = UnityEngine.Random.Range(-1f, 1f);
+            block.transform.localPosition =(new Vector3(ba, 0, 0)) + block.transform.localPosition;
+        }
         //spawnPlatformPosition = player.gameObject.transform.position;
     }
 

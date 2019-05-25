@@ -27,11 +27,11 @@ public class PlayerControl : MonoBehaviour
     public float speed;
     public float jumpForce;
     public int id;
-    
+
     private Rigidbody2D rigidbody;
 
     public bool Grounded;
-    public bool aiMode; 
+    public bool aiMode;
     public Transform groundCheck;
     public float checkRadius;
     public LayerMask Ground;
@@ -39,10 +39,19 @@ public class PlayerControl : MonoBehaviour
     public bool Dead;
     public float deadBarrier;
 
+    public bool stuck;
+
     private bool facingRight = true;
+
+    public int queueSize; 
+    public Queue queue = new Queue();
+
     // Start is called before the first frame update
     void Start()
     {
+        for (float i = 0; i < 10; i++ ){
+            queue.Enqueue(0f + (i /1000) );
+        }
         rigidbody = GetComponent<Rigidbody2D>();
         Dead = false;
     }
@@ -91,6 +100,8 @@ public class PlayerControl : MonoBehaviour
         {
             rigidbody.velocity = Vector2.zero;
         }
+        queue.Dequeue();
+        queue.Enqueue(gameObject.transform.position.x);
     }
 
     void Move(float dir)
@@ -144,4 +155,6 @@ public class PlayerControl : MonoBehaviour
             Dead = false;
         }
     }
+
+
 }

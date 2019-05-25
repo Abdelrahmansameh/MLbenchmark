@@ -202,3 +202,4 @@ MonoBehaviour:
   n_h2: 0
   n_y: 0
   individual: []
+  blockRadius: 5

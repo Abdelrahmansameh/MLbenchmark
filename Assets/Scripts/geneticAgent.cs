@@ -26,9 +26,12 @@ public class geneticAgent : MonoBehaviour
     private Matrix<double> W2;
     private Matrix<double> W3;
 
-    public Vector<double> output; 
+    public Vector<double> output;
 
+    public float blockRadius;
+    
     public void Initialize_Random(int x, int h, int h2, int y)
+
     {
         n_x = x;
         n_h = h;
@@ -110,7 +113,7 @@ public class geneticAgent : MonoBehaviour
                 offset++;
             }
         }
-        print(W1);
+        //print(W1);
        // print(offset);
         for (int i = 0; i < W2shape.Item1; i++)
         {
@@ -120,7 +123,7 @@ public class geneticAgent : MonoBehaviour
                 offset++;
             }
         }
-        print(W2);
+        //print(W2);
         // print(offset);
 
         for (int i = 0; i < W3shape.Item1; i++)
@@ -131,11 +134,14 @@ public class geneticAgent : MonoBehaviour
                 offset++;
             }
         }
-        print(W3);
+       // print(W3);
     }
         // Update is called once per frame
         void Update()
     {
+        if (!gameObject.GetComponent<PlayerControl>().Dead)
+        {
+
         GameObject[] platforms = GameObject.FindGameObjectsWithTag("platform");
         Array.Sort<GameObject>(platforms,
            delegate (GameObject m, GameObject n)
@@ -155,12 +161,26 @@ public class geneticAgent : MonoBehaviour
                return 1;
            }
            );
+        int foo = 0;
+        foreach(GameObject block in GameObject.FindGameObjectsWithTag("block"))
+        {
+            float tmp = Math.Abs(block.transform.position.x  - gameObject.transform.position.x);
+            print(tmp);
+            if (tmp < blockRadius && block.transform.position.x >= gameObject.transform.position.x){
+                foo = 1;
+            }
+        }
         Vector<double> input = Vector<double>.Build.Dense(n_x);
-        input[0] = gameObject.transform.position.x;
-        input[1] = gameObject.transform.position.y;
-        input[2] = Math.Abs(platforms[0].transform.position.x - gameObject.transform.position.x);
-        output = propagation(input);
-        //print(output);
+        input[0] = Math.Abs(platforms[0].transform.position.x - gameObject.transform.position.x);
+        input[1] = foo;
+
+        print(input);
+        //input[1] = gameObject.transform.position.y;
+        //input[2] = Math.Abs(platforms[0].transform.position.x - gameObject.transform.position.x);
+            output = propagation(input);
+            //print(output);
+        }
+
     }
 
     void updateMove()

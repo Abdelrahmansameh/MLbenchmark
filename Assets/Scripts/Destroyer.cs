@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Destroyer : MonoBehaviour
 {
@@ -22,7 +23,7 @@ public class Destroyer : MonoBehaviour
     void Update()
     {
         player = topPlayerFinder.topPlayer;
-        if (gameObject.transform.position.x < player.transform.position.x - destroyDistance)
+        if (Math.Abs(player.transform.position.x - gameObject.transform.position.x) > destroyDistance )
         {
             Destroy(gameObject);
         }

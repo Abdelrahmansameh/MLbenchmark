@@ -133,9 +133,7 @@ public class God : MonoBehaviour
         {
             if (AllDead())
             {
-                Debug.Log("Im gonna call the thing\n");
                 double[,] new_weights = current_pop.SexAndMutations();
-                Console.WriteLine("I called the thing \n");
                 GameObject[] pop = new GameObject[pop_size];
                 for (int i = 0; i < pop_size; i++)
                 {
@@ -159,16 +157,22 @@ public class God : MonoBehaviour
                         Physics2D.IgnoreCollision(p1.GetComponent<BoxCollider2D>(), p2.GetComponent<BoxCollider2D>());
                     }
                     GameObject player = players[0];
-                    Vector3 spawnPlatformPosition = new Vector3(player.transform.position.x + 3, 0, 0);
-                    Instantiate(platform, spawnPlatformPosition, Quaternion.identity);
-                    gameObject.GetComponent<spawnPlatform>().Initialize();
+                    /*Vector3 spawnPlatformPosition = new Vector3(player.transform.position.x + 3, 0, 0);
+                    Instantiate(platform, spawnPlatformPosition, Quaternion.identity);*/
                 }
+
 
                 foreach (GameObject p in current_pop.pop)
                 {
-                        print(p.GetComponent<PlayerControl>().Dead);
                         Destroy(p);
                 }
+
+                foreach (GameObject plat in GameObject.FindGameObjectsWithTag("platform")){
+                    Destroy(plat);
+                }
+
+                gameObject.GetComponent<spawnPlatform>().Initialize();
+
                 current_pop = new Population(pop_size, pop, num_parents, num_weights, num_parents);
                 gen_counter++;
             }
