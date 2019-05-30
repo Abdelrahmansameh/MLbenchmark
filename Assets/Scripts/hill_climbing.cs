@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Distributions;
-
+using MathNet.Numerics.LinearAlgebra;
 // A Single-Layer Perceptron with copy and random modification
 public class SLP
 {   
