@@ -172,7 +172,7 @@ public class God : MonoBehaviour
                 }
 
                 gameObject.GetComponent<spawnPlatform>().Initialize();
-
+                GameObject.FindGameObjectWithTag("laser").GetComponent<Laser>().Initialize();
                 current_pop = new Population(pop_size, pop, num_parents, num_weights, num_parents);
                 gen_counter++;
             }

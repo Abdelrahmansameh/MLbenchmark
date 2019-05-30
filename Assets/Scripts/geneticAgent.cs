@@ -172,8 +172,9 @@ public class geneticAgent : MonoBehaviour
         }
         Vector<double> input = Vector<double>.Build.Dense(n_x);
         input[0] = Math.Abs(platforms[0].transform.position.x - gameObject.transform.position.x);
-        input[1] = foo;
-
+        input[1] = Math.Abs(platforms[1].transform.position.x - gameObject.transform.position.x);
+        input[2] = foo;
+        input[3] = 2;
         print(input);
         //input[1] = gameObject.transform.position.y;
         //input[2] = Math.Abs(platforms[0].transform.position.x - gameObject.transform.position.x);

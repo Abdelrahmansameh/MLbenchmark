@@ -35,6 +35,7 @@ public class PlayerControl : MonoBehaviour
     public Transform groundCheck;
     public float checkRadius;
     public LayerMask Ground;
+    public LayerMask laser;
 
     public bool Dead;
     public float deadBarrier;
@@ -46,9 +47,11 @@ public class PlayerControl : MonoBehaviour
     public int queueSize; 
     public Queue queue = new Queue();
 
+    private bool check_again;
     // Start is called before the first frame update
     void Start()
     {
+        check_again = true;
         for (float i = 0; i < 10; i++ ){
             queue.Enqueue(0f + (i /1000) );
         }
@@ -89,6 +92,7 @@ public class PlayerControl : MonoBehaviour
 
 	}
         Grounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, Ground);
+
 
         Move(mv.direction);
 
@@ -131,7 +135,6 @@ public class PlayerControl : MonoBehaviour
     controls GetControls()
     {
         controls ret = new controls();
-        ret.direction = 1;
         Vector<double> foo = gameObject.GetComponent<geneticAgent>().output;
         if (foo[0]> 0.5)
         {
@@ -141,18 +144,35 @@ public class PlayerControl : MonoBehaviour
         {
             ret.jump = 0;
         }
+        if (foo[1] > 0.5)
+        {
+            ret.direction = 1;
+        }
+        else
+        {
+            ret.direction = 0;
+        }
         return ret;
     }
 
     void AmIDead()
     {
-        if (gameObject.transform.position.y <= deadBarrier)
+        if (check_again)
         {
-            Dead = true;
-        }
-        else
-        {
-            Dead = false;
+            if (gameObject.transform.position.y <= deadBarrier)
+            {
+                Dead = true;
+            }
+            else
+            {
+                Dead = false;
+            }
+
+            if (Physics2D.OverlapCircle(gameObject.transform.position, 1, laser))
+            {
+                Dead = true;
+                check_again = false;
+            }
         }
     }
 
