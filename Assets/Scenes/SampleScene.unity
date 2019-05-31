@@ -33,7 +33,7 @@ RenderSettings:
   m_HaloTexture: {fileID: 0}
   m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
   m_DefaultReflectionMode: 0
-  m_DefaultReflectionResolution: 128
+  m_DefaultReflectionResolution: 64
   m_ReflectionBounces: 1
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
@@ -69,7 +69,7 @@ LightmapSettings:
     m_FinalGather: 0
     m_FinalGatherFiltering: 1
     m_FinalGatherRayCount: 256
-    m_ReflectionCompression: 2
+    m_ReflectionCompression: 1
     m_MixedBakeMode: 2
     m_BakeBackend: 0
     m_PVRSampling: 1
@@ -224,7 +224,7 @@ GameObject:
   - component: {fileID: 827874646}
   - component: {fileID: 827874647}
   m_Layer: 10
-  m_Name: Cube
+  m_Name: laser
   m_TagString: laser
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -322,7 +322,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1bac6edd632f8749a7c4802d4bc91c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
+  speed: 2
 --- !u!61 &827874647
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -385,9 +385,10 @@ MonoBehaviour:
   - {fileID: 1969424939848940397, guid: ae5ee8629eecadd4d835588e1199e5fb, type: 3}
   - {fileID: 1969424939848940397, guid: 690c2e5d1cb1fc24c867160e84f87814, type: 3}
   spawnDistance: 20
-  gap: 6
+  gap: 8.5
   spawnPlatformPosition: {x: 0, y: 0, z: 0}
   playerSpawner: {fileID: 832080948}
+  Gap: {fileID: 5463279185488881840, guid: 32a079d42d250c840883d7eee2fe5a69, type: 3}
 --- !u!4 &832080950
 Transform:
   m_ObjectHideFlags: 0
@@ -430,16 +431,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   n_x: 4
-  n_h: 3
-  n_h2: 2
+  n_h: 16
+  n_h2: 6
   n_y: 2
   player: {fileID: 8153359907056128640, guid: 235126f1845359746810e1c8dfa324ca, type: 3}
   spawnPoint: {fileID: 913011470}
   platform: {fileID: 1969424939848940397, guid: ae5ee8629eecadd4d835588e1199e5fb,
     type: 3}
-  pop_size: 100
-  num_generations: 100
-  num_parents: 10
+  pop_size: 200
+  num_generations: 500
+  num_parents: 20
+  champion: []
+  champion_score: 0
 --- !u!114 &832080953
 MonoBehaviour:
   m_ObjectHideFlags: 0

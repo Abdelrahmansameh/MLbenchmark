@@ -17,8 +17,8 @@ public class Laser : MonoBehaviour
 
     public void Initialize()
     {
-        Vector2 spawnpoint = new Vector2(GameObject.FindGameObjectWithTag("Respawn").transform.position.x - 10, gameObject.transform.position.y);
-        print(spawnpoint);
+        Vector2 spawnpoint = new Vector2(GameObject.FindGameObjectWithTag("Respawn").transform.position.x - 20, gameObject.transform.position.y);
+        //print(spawnpoint);
         gameObject.transform.position = spawnpoint;
     }
     // Update is called once per frame

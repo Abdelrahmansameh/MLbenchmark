@@ -168,7 +168,7 @@ public class PlayerControl : MonoBehaviour
                 Dead = false;
             }
 
-            if (Physics2D.OverlapCircle(gameObject.transform.position, 1, laser))
+            if (Physics2D.OverlapCircle(gameObject.transform.position, 0.5f, laser))
             {
                 Dead = true;
                 check_again = false;

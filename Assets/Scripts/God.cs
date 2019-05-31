@@ -12,9 +12,13 @@ public class Population
 {
     public int num_players;
     public GameObject[] pop;
+    public double[] champion;
+    public float champion_score;
     public int num_parents;
     public int num_offsprings;
     public int num_weights;
+    public float mutation_rate1;
+    public float mutation_rate2;
 
     public Population(int numplayer, GameObject[] population, int numparents, int numweights, int parents)
     {
@@ -55,6 +59,8 @@ public class Population
         double[, ] offsprings = new double[num_offsprings, num_weights];
         System.Random random = new System.Random();
         GameObject[] parents = select_mating_pool();
+        champion = parents[0].GetComponent<geneticAgent>().individual;
+        champion_score = parents[0].transform.position.x;
         for (int counter = 0; counter < num_offsprings; counter++)
         {
             int i = random.Next(0, num_parents);
@@ -69,7 +75,7 @@ public class Population
             {
                 offsprings[counter, gene] = parents[i].GetComponent<geneticAgent>().individual[gene];
                 double tmp = normal.Sample();
-                if (UnityEngine.Random.Range(0f, 1f) < 0.3)
+                if (UnityEngine.Random.Range(0f, 1f) < mutation_rate2)
                 {
                     offsprings[counter, gene] += tmp;
                 }
@@ -79,7 +85,7 @@ public class Population
             {
                 offsprings[counter, gene] = parents[j].GetComponent<geneticAgent>().individual[gene];
                 double tmp = normal.Sample();
-                if (UnityEngine.Random.Range(0f, 1f) < 0.3)
+                if (UnityEngine.Random.Range(0f, 1f) < 0.2)
                 {
                     offsprings[counter, gene] += tmp;
                 }
@@ -107,6 +113,10 @@ public class God : MonoBehaviour
     public int pop_size = 50;
     public int num_generations = 100;
     public int num_parents = 12;
+
+    public double[] champion;
+    public float champion_score;
+    
     int gen_counter = 0;
     Population current_pop;
     // Start is called before the first frame update
@@ -123,6 +133,8 @@ public class God : MonoBehaviour
             pop[i] = p;
         }
         current_pop = new Population(pop_size, pop, num_parents,num_weights, num_parents);
+        current_pop.mutation_rate1 = 0.7f;
+        current_pop.mutation_rate2 = 0.7f;
         gen_counter++;
     }
 
@@ -133,7 +145,23 @@ public class God : MonoBehaviour
         {
             if (AllDead())
             {
+
                 double[,] new_weights = current_pop.SexAndMutations();
+
+                if (gen_counter == 0)
+                {
+                    champion = current_pop.champion;
+                    champion_score = current_pop.champion_score;
+                }
+
+                else
+                {
+                    if (current_pop.champion_score >= champion_score)
+                    {
+                        champion = current_pop.champion;
+                        champion_score = current_pop.champion_score;
+                    }
+                }
                 GameObject[] pop = new GameObject[pop_size];
                 for (int i = 0; i < pop_size; i++)
                 {
@@ -141,9 +169,16 @@ public class God : MonoBehaviour
                     //p.GetComponent<PlayerControl>().speed = 10-i;
                     p.GetComponent<PlayerControl>().id = i;
                     double[] tmp = new double[num_weights];
-                    for (int j = 0; j < num_weights; j++)
+                    if (i == 0)
                     {
-                        tmp[j] = new_weights[i, j];
+                        tmp = champion;
+                    }
+                    else
+                    {
+                        for (int j = 0; j < num_weights; j++)
+                        {
+                            tmp[j] = new_weights[i, j];
+                        }
                     }
                     p.GetComponent<geneticAgent>().Initialize_unfold(tmp, n_x, n_h, n_h2, n_y);
                     pop[i] = p;
@@ -171,9 +206,29 @@ public class God : MonoBehaviour
                     Destroy(plat);
                 }
 
+                foreach (GameObject gap in GameObject.FindGameObjectsWithTag("gap"))
+                {
+                    Destroy(gap);
+                }
+
                 gameObject.GetComponent<spawnPlatform>().Initialize();
                 GameObject.FindGameObjectWithTag("laser").GetComponent<Laser>().Initialize();
                 current_pop = new Population(pop_size, pop, num_parents, num_weights, num_parents);
+                if (gen_counter < 10)
+                {
+                    current_pop.mutation_rate1 = 0.7f;
+                    current_pop.mutation_rate2 = 0.5f;
+                }
+                else if (gen_counter < 20)
+                {
+                    current_pop.mutation_rate1 = 0.7f;
+                    current_pop.mutation_rate2 = 0.3f;
+                }
+                else
+                {
+                    current_pop.mutation_rate1 = 0.7f;
+                    current_pop.mutation_rate2 = 0.3f;
+                }
                 gen_counter++;
             }
         }

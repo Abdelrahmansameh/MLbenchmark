@@ -142,7 +142,7 @@ public class geneticAgent : MonoBehaviour
         if (!gameObject.GetComponent<PlayerControl>().Dead)
         {
 
-        GameObject[] platforms = GameObject.FindGameObjectsWithTag("platform");
+    /*    GameObject[] platforms = GameObject.FindGameObjectsWithTag("platform");
         Array.Sort<GameObject>(platforms,
            delegate (GameObject m, GameObject n)
            {
@@ -160,21 +160,71 @@ public class geneticAgent : MonoBehaviour
                }
                return 1;
            }
-           );
+           );*/
         int foo = 0;
         foreach(GameObject block in GameObject.FindGameObjectsWithTag("block"))
         {
             float tmp = Math.Abs(block.transform.position.x  - gameObject.transform.position.x);
-            print(tmp);
-            if (tmp < blockRadius && block.transform.position.x >= gameObject.transform.position.x){
+            //print(tmp);
+            if (tmp < 2*blockRadius && block.transform.position.x >= gameObject.transform.position.x){
                 foo = 1;
             }
         }
-        Vector<double> input = Vector<double>.Build.Dense(n_x);
-        input[0] = Math.Abs(platforms[0].transform.position.x - gameObject.transform.position.x);
-        input[1] = Math.Abs(platforms[1].transform.position.x - gameObject.transform.position.x);
-        input[2] = foo;
-        input[3] = 2;
+
+        int ba = 0;
+        foreach (GameObject gap in GameObject.FindGameObjectsWithTag("gap"))
+        {
+            float tmp = Math.Abs(gap.transform.position.x - gameObject.transform.position.x);
+            //print(tmp);
+            if (tmp < blockRadius && gap.transform.position.x >= gameObject.transform.position.x)
+            {
+                ba = 1;
+            }
+        }
+
+        int fooba = 2;
+        foreach (GameObject block in GameObject.FindGameObjectsWithTag("groundBlock"))
+        {
+            float tmp = Math.Abs(block.transform.position.x - gameObject.transform.position.x);
+            //print(tmp);
+            if (tmp < blockRadius)
+                {
+                fooba = 1;
+            }
+        }
+            Vector<double> input = Vector<double>.Build.Dense(n_x);
+
+        //input[0] = Math.Abs(platforms[0].transform.position.x - gameObject.transform.position.x);
+        //input[1] = Math.Abs(platforms[1].transform.position.x - gameObject.transform.position.x);
+
+
+  /*      Array.Sort<GameObject>(platforms,
+        delegate (GameObject m, GameObject n)
+        {
+               GameObject ULn;
+               GameObject ULm;
+               ULm = m.transform.Find("UR").gameObject;
+               ULn = n.transform.Find("UR").gameObject;
+               if (Math.Abs(ULm.transform.position.x - gameObject.transform.position.x) < Math.Abs(ULn.transform.position.x - gameObject.transform.position.x))
+               {
+                   return -1;
+               }
+               else if (Math.Abs(ULm.transform.position.x - gameObject.transform.position.x) == Math.Abs(ULn.transform.position.x - gameObject.transform.position.x))
+               {
+                   return 0;
+               }
+               return 1;
+           }
+           );
+*/
+            //input[2] = Math.Abs(platforms[0].transform.position.x - gameObject.transform.position.x);
+
+        input[0] = ba;
+        input[1] = foo;
+        //input[2] = fooba;
+        input[2] = gameObject.transform.position.y;
+
+        input[3] = 1;
         print(input);
         //input[1] = gameObject.transform.position.y;
         //input[2] = Math.Abs(platforms[0].transform.position.x - gameObject.transform.position.x);
