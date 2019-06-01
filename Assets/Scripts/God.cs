@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Distributions;
 using System;
-
-
+using TMPro;
+using System.Linq;
 
 public class Population
 {
@@ -17,8 +18,8 @@ public class Population
     public int num_parents;
     public int num_offsprings;
     public int num_weights;
-    public float mutation_rate1;
-    public float mutation_rate2;
+    public float mutation_rate;
+    public float avg_score;
 
     public Population(int numplayer, GameObject[] population, int numparents, int numweights, int parents)
     {
@@ -56,6 +57,12 @@ public class Population
 
     public double[,] SexAndMutations()
     {
+        float avg = 0;
+        foreach(GameObject player in pop)
+        {
+            avg += player.transform.position.x;
+        }
+        avg_score = avg / num_players;
         double[, ] offsprings = new double[num_offsprings, num_weights];
         System.Random random = new System.Random();
         GameObject[] parents = select_mating_pool();
@@ -75,7 +82,7 @@ public class Population
             {
                 offsprings[counter, gene] = parents[i].GetComponent<geneticAgent>().individual[gene];
                 double tmp = normal.Sample();
-                if (UnityEngine.Random.Range(0f, 1f) < mutation_rate2)
+                if (UnityEngine.Random.Range(0f, 1f) < mutation_rate)
                 {
                     offsprings[counter, gene] += tmp;
                 }
@@ -109,100 +116,194 @@ public class God : MonoBehaviour
     public GameObject spawnPoint;
     public GameObject platform;
 
-    int num_weights;
+    public int num_weights;
     public int pop_size = 50;
     public int num_generations = 100;
     public int num_parents = 12;
 
-    public double[] champion;
-    public float champion_score;
+    public double[] champions;
+    public float[] champion_scores;
     
     int gen_counter = 0;
-    Population current_pop;
+
+    public int num_pops;
+    Population[] current_pops;
+
+    public TextMeshProUGUI scoreUI;
+    public TextMeshProUGUI genUI;
+
+    public string bestscorepath;
+    public string championpath;
+    public string scorepath;
+    public string avgscorepath;
+
     // Start is called before the first frame update
     void Start()
     {
+        string DateTime = System.DateTime.Now.ToString("dd-MM-yyyy HH.mm.ss");
+
+        bestscorepath = @"Gscores\" + DateTime + "-bestscore.txt" ;
+        championpath = @"Gscores\" + DateTime + "-champion.txt";
+        scorepath = @"Gscores\" + DateTime + "-score.txt";
+        avgscorepath = @"Gscores\" + DateTime + "-avgscore.txt";
+
+        champion_scores = new float[num_pops];
+        current_pops = new Population[num_pops];
         num_weights = n_x * n_h + n_h * n_h2 + n_h2 * n_y;
-        GameObject[] pop = new GameObject[pop_size];
-        for (int i = 0; i < pop_size; i++)
-        {
-            GameObject p = Instantiate(player, spawnPoint.transform.position, Quaternion.identity);
-            //p.GetComponent<PlayerControl>().speed = 10-i;
-            p.GetComponent<PlayerControl>().id = i;
-            p.GetComponent<geneticAgent>().Initialize_Random(n_x, n_h, n_h2, n_y);
-            pop[i] = p;
+        for (int j = 0; j < num_pops; j++) {
+            GameObject[] pop = new GameObject[pop_size];
+            for (int i = 0; i < pop_size; i++)
+            {
+                GameObject p = Instantiate(player, spawnPoint.transform.position, Quaternion.identity);
+                //p.GetComponent<PlayerControl>().speed = 10-i;
+                p.GetComponent<PlayerControl>().id = i;
+                p.GetComponent<geneticAgent>().Initialize_Random(n_x, n_h, n_h2, n_y);
+                pop[i] = p;
+            }
+            current_pops[j] = new Population(pop_size, pop, num_parents, num_weights, num_parents);
+            current_pops[j].mutation_rate = 0.5f;
         }
-        current_pop = new Population(pop_size, pop, num_parents,num_weights, num_parents);
-        current_pop.mutation_rate1 = 0.7f;
-        current_pop.mutation_rate2 = 0.7f;
         gen_counter++;
     }
 
     // Update is called once per frame
     void Update()
     {
+        Resources.UnloadUnusedAssets();
+        scoreUI.text = "Best score: " + champion_scores.Max().ToString("0");
+        genUI.text = "Generation: " + gen_counter.ToString("0");
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+            foreach (GameObject p1 in players)
+            {
+                p1.GetComponent<PlayerControl>().Dead = true;
+            }
+        }
+
+
         if (gen_counter <= num_generations)
         {
             if (AllDead())
             {
-
-                double[,] new_weights = current_pop.SexAndMutations();
-
-                if (gen_counter == 0)
+                for (int j = 0; j < num_pops; j++)
                 {
-                    champion = current_pop.champion;
-                    champion_score = current_pop.champion_score;
-                }
+                    double[,] new_weights = current_pops[j].SexAndMutations();
 
-                else
-                {
-                    if (current_pop.champion_score >= champion_score)
+                    if (gen_counter == 0)
                     {
-                        champion = current_pop.champion;
-                        champion_score = current_pop.champion_score;
+                        champions = current_pops[j].champion;
+                        champion_scores[j] = current_pops[j].champion_score;
+                        string[] lines = new string[num_weights];
+                        for (int i = 0; i < num_weights; i++)
+                        {
+                            lines[i] = champions[i].ToString("0.00");
+                        }
+                        System.IO.File.WriteAllLines(championpath, lines);
+                        using (StreamWriter sw = File.CreateText(bestscorepath))
+                        {
+                            sw.WriteLine(champion_scores[j].ToString("0"));
+                        }
+                        using (StreamWriter sw = File.CreateText(scorepath))
+                        {
+                            sw.WriteLine(champion_scores[j].ToString("0"));
+                        }
+                        using (StreamWriter sw = File.CreateText(avgscorepath))
+                        {
+                            sw.WriteLine(current_pops[j].avg_score.ToString("0"));
+                        }
                     }
-                }
-                GameObject[] pop = new GameObject[pop_size];
-                for (int i = 0; i < pop_size; i++)
-                {
-                    GameObject p = Instantiate(player, spawnPoint.transform.position, Quaternion.identity);
-                    //p.GetComponent<PlayerControl>().speed = 10-i;
-                    p.GetComponent<PlayerControl>().id = i;
-                    double[] tmp = new double[num_weights];
-                    if (i == 0)
+
+                    else
                     {
-                        tmp = champion;
+
+                        if (current_pops[j].champion_score >= champion_scores[j])
+                        {
+                            champions = current_pops[j].champion;
+                            champion_scores[j] = current_pops[j].champion_score;
+                            string[] lines = new string[num_weights];
+                            for (int i = 0; i < num_weights; i++)
+                            {
+                                lines[i] = champions[i].ToString("0.00");
+                            }
+                            System.IO.File.WriteAllLines(championpath, lines);
+                        }
+
+                        using (StreamWriter sw = File.AppendText(scorepath))
+                        {
+                            sw.WriteLine(current_pops[j].champion_score.ToString("0"));
+                        }
+
+                        using (StreamWriter sw = File.AppendText(bestscorepath))
+                        {
+                            sw.WriteLine(champion_scores[j].ToString("0"));
+                        }
+
+                        using (StreamWriter sw = File.AppendText(avgscorepath))
+                        {
+                            sw.WriteLine(current_pops[j].avg_score.ToString("0"));
+                        }
+                    }
+                    GameObject[] pop = new GameObject[pop_size];
+                    for (int i = 0; i < pop_size; i++)
+                    {
+                        GameObject p = Instantiate(player, spawnPoint.transform.position, Quaternion.identity);
+                        //p.GetComponent<PlayerControl>().speed = 10-i;
+                        p.GetComponent<PlayerControl>().id = i;
+                        double[] tmp = new double[num_weights];
+                        if (i == 0)
+                        {
+                            SpriteRenderer sprite = p.GetComponent<SpriteRenderer>();
+
+                            sprite.color = Color.blue;
+
+                            tmp = champions;
+                        }
+                        else
+                        {
+                            for (int j2 = 0; j2 < num_weights; j2++)
+                            {
+                                tmp[j2] = new_weights[i, j2];
+                            }
+                        }
+                        p.GetComponent<geneticAgent>().Initialize_unfold(tmp, n_x, n_h, n_h2, n_y);
+                        pop[i] = p;
+
+                    }
+
+
+
+                    foreach (GameObject p in current_pops[j].pop)
+                    {
+                        Destroy(p);
+                    }
+
+
+                    current_pops[j] = new Population(pop_size, pop, num_parents, num_weights, num_parents);
+                    if (gen_counter < 10)
+                    {
+                        current_pops[j].mutation_rate = 0.5f;
                     }
                     else
                     {
-                        for (int j = 0; j < num_weights; j++)
-                        {
-                            tmp[j] = new_weights[i, j];
-                        }
+                        current_pops[j].mutation_rate = 0.3f;
                     }
-                    p.GetComponent<geneticAgent>().Initialize_unfold(tmp, n_x, n_h, n_h2, n_y);
-                    pop[i] = p;
+                }
 
-                    }
-                    GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-                    foreach (GameObject p1 in players)
-                    {
+                GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+                foreach (GameObject p1 in players)
+                {
                     foreach (GameObject p2 in players)
                     {
                         Physics2D.IgnoreCollision(p1.GetComponent<BoxCollider2D>(), p2.GetComponent<BoxCollider2D>());
                     }
-                    GameObject player = players[0];
+                    //GameObject player = players[0];
                     /*Vector3 spawnPlatformPosition = new Vector3(player.transform.position.x + 3, 0, 0);
                     Instantiate(platform, spawnPlatformPosition, Quaternion.identity);*/
                 }
 
-
-                foreach (GameObject p in current_pop.pop)
+                foreach (GameObject plat in GameObject.FindGameObjectsWithTag("platform"))
                 {
-                        Destroy(p);
-                }
-
-                foreach (GameObject plat in GameObject.FindGameObjectsWithTag("platform")){
                     Destroy(plat);
                 }
 
@@ -213,22 +314,7 @@ public class God : MonoBehaviour
 
                 gameObject.GetComponent<spawnPlatform>().Initialize();
                 GameObject.FindGameObjectWithTag("laser").GetComponent<Laser>().Initialize();
-                current_pop = new Population(pop_size, pop, num_parents, num_weights, num_parents);
-                if (gen_counter < 10)
-                {
-                    current_pop.mutation_rate1 = 0.7f;
-                    current_pop.mutation_rate2 = 0.5f;
-                }
-                else if (gen_counter < 20)
-                {
-                    current_pop.mutation_rate1 = 0.7f;
-                    current_pop.mutation_rate2 = 0.3f;
-                }
-                else
-                {
-                    current_pop.mutation_rate1 = 0.7f;
-                    current_pop.mutation_rate2 = 0.3f;
-                }
+
                 gen_counter++;
             }
         }
@@ -237,11 +323,14 @@ public class God : MonoBehaviour
    bool AllDead()
     {
         bool ret = true;
-        foreach(GameObject p in current_pop.pop)
+        foreach (Population current_pop in current_pops)
         {
-            if (!p.GetComponent<PlayerControl>().Dead)
+            foreach (GameObject p in current_pop.pop)
             {
-                ret = false;
+                if (!p.GetComponent<PlayerControl>().Dead)
+                {
+                    ret = false;
+                }
             }
         }
         return ret;

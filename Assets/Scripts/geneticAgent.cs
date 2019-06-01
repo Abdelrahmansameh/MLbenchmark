@@ -29,10 +29,20 @@ public class geneticAgent : MonoBehaviour
     public Vector<double> output;
 
     public float blockRadius;
-    
+    LineRenderer line ;
+
+    void Start()
+    {
+        line = gameObject.GetComponent<LineRenderer>();
+        line.positionCount = 4;
+
+        line.SetPosition(0, gameObject.transform.position);
+
+    }
     public void Initialize_Random(int x, int h, int h2, int y)
 
     {
+
         n_x = x;
         n_h = h;
         n_h2 = h2;
@@ -139,6 +149,11 @@ public class geneticAgent : MonoBehaviour
         // Update is called once per frame
         void Update()
     {
+        line.SetPosition(0, gameObject.transform.position);
+        line.SetPosition(1, gameObject.transform.position);
+        line.SetPosition(2, gameObject.transform.position);
+        line.SetPosition(3, gameObject.transform.position);
+
         if (!gameObject.GetComponent<PlayerControl>().Dead)
         {
 
@@ -164,12 +179,16 @@ public class geneticAgent : MonoBehaviour
         int foo = 0;
         foreach(GameObject block in GameObject.FindGameObjectsWithTag("block"))
         {
-            float tmp = Math.Abs(block.transform.position.x  - gameObject.transform.position.x);
+            GameObject UL = block.transform.Find("UUL").gameObject;
+
+            float tmp = Math.Abs(UL.transform.position.x  - gameObject.transform.position.x);
             //print(tmp);
-            if (tmp < 2*blockRadius && block.transform.position.x >= gameObject.transform.position.x){
+            if (tmp < blockRadius && UL.transform.position.x >= gameObject.transform.position.x){
                 foo = 1;
+                line.SetPosition(1, UL.transform.position);
+                }
+
             }
-        }
 
         int ba = 0;
         foreach (GameObject gap in GameObject.FindGameObjectsWithTag("gap"))
@@ -179,8 +198,10 @@ public class geneticAgent : MonoBehaviour
             if (tmp < blockRadius && gap.transform.position.x >= gameObject.transform.position.x)
             {
                 ba = 1;
+                line.SetPosition(2, gap.transform.position);
+
+                }
             }
-        }
 
         int fooba = 2;
         foreach (GameObject block in GameObject.FindGameObjectsWithTag("groundBlock"))
@@ -221,11 +242,16 @@ public class geneticAgent : MonoBehaviour
 
         input[0] = ba;
         input[1] = foo;
-        //input[2] = fooba;
-        input[2] = gameObject.transform.position.y;
-
-        input[3] = 1;
-        print(input);
+            //input[2] = fooba;
+        input[2] = gameObject.transform.position.y + 1.58532;
+        /*if (gameObject.GetComponent<PlayerControl>().Grounded)
+        {
+                line.SetPosition(3, new Vector3(1, 1, 1));
+                
+        }
+        input[2] = gameObject.GetComponent<PlayerControl>().Grounded ? 1 : 0 ;
+        */input[3] = 1;
+        //print(input);
         //input[1] = gameObject.transform.position.y;
         //input[2] = Math.Abs(platforms[0].transform.position.x - gameObject.transform.position.x);
             output = propagation(input);

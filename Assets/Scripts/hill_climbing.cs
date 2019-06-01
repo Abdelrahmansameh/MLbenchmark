@@ -3,7 +3,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.LinearAlgebra;
 // A Single-Layer Perceptron with copy and random modification
-public class SLP
+/*public class SLP
 {   
       // Algorithm Parameters 
       public double alpha_w = 0.01;
@@ -192,7 +192,7 @@ public class SimpleHillClimber
       }
   }
 
-
+/*
 class Driver
 {
 
@@ -230,3 +230,4 @@ class Driver
       }
 
 }
+*/

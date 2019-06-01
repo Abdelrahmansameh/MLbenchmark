@@ -62,7 +62,7 @@ public class spawnPlatform : MonoBehaviour
             GameObject plat = Instantiate(platforms[1], spawnPlatformPosition, Quaternion.identity);
             GameObject block = plat.transform.Find("UpperBlock").gameObject;
             //print(block.transform.localPosition);
-            float ba = UnityEngine.Random.Range(-1f, 1f);
+            float ba = UnityEngine.Random.Range(-1f, 0.8f);
             block.transform.localPosition =(new Vector3(ba, 0, 0)) + block.transform.localPosition;
             Instantiate(Gap, new Vector2(plat.transform.Find("UR").gameObject.transform.position.x + 0.2f, plat.transform.Find("UR").gameObject.transform.position.y), Quaternion.identity);
 

@@ -136,6 +136,8 @@ public class PlayerControl : MonoBehaviour
     {
         controls ret = new controls();
         Vector<double> foo = gameObject.GetComponent<geneticAgent>().output;
+        //Vector<double> foo = gameObject.GetComponent<hillAgent>().output;
+
         if (foo[0]> 0.5)
         {
             ret.jump = 1;
@@ -168,10 +170,14 @@ public class PlayerControl : MonoBehaviour
                 Dead = false;
             }
 
-            if (Physics2D.OverlapCircle(gameObject.transform.position, 0.5f, laser))
+            if (Physics2D.OverlapCircle(gameObject.transform.position, 0.2f, laser))
             {
                 Dead = true;
                 check_again = false;
+            }
+            if (Dead)
+            {
+                gameObject.GetComponent<SpriteRenderer>().enabled = false;
             }
         }
     }
