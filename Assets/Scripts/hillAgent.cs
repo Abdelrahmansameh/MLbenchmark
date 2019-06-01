@@ -5,6 +5,7 @@ using UnityEngine;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.LinearAlgebra;
+
 public class SLP
 {
     // Algorithm Parameters 
@@ -16,7 +17,7 @@ public class SLP
     public int output_size;
 
     public Matrix<double> W;
-    public Vector<double> b;
+    //public Vector<double> b;
 
     public SLP(int inputs, int outputs)
     {
@@ -30,13 +31,13 @@ public class SLP
         // Resets the weights and biases to normal distribution with scaling
         this.W = scaling * Matrix<double>.Build.Random(this.input_size, this.output_size);
         // bias
-        this.b = scaling * Vector<double>.Build.Random(this.output_size);
+        //this.b = scaling * Vector<double>.Build.Random(this.output_size);
     }
 
     public Vector<double> predict(Vector<double> x)
     {
         // Feedforward prediction of SLP.
-        var a = x * this.W + this.b;
+        var a = x * this.W; // + this.b;
         return Sigmoid(a);
     }
 
@@ -45,7 +46,7 @@ public class SLP
         // Creates a copy of this SLP, with possible modification.
         SLP b = new SLP(this.input_size, this.output_size);
         b.W = this.W.Clone();
-        b.b = this.b.Clone();
+        //b.b = this.b.Clone();
 
         if (modify)
         {
