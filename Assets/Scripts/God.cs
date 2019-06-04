@@ -253,9 +253,7 @@ public class God : MonoBehaviour
                         double[] tmp = new double[num_weights];
                         if (i == 0)
                         {
-                            SpriteRenderer sprite = p.GetComponent<SpriteRenderer>();
-
-                            sprite.color = Color.blue;
+                            p.GetComponent<PlayerControl>().champion = true;
 
                             tmp = champions;
                         }

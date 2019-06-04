@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
+using TMPro;
 
 public class controls
 {
@@ -47,7 +48,22 @@ public class PlayerControl : MonoBehaviour
     public int queueSize; 
     public Queue queue = new Queue();
 
-    private bool check_again;
+    public bool check_again;
+
+    public Sprite running;
+    public Sprite standing;
+    public Sprite champion_running;
+    public Sprite champion_standing;
+    public Sprite jumping;
+    public Sprite champion_jumping;
+
+    public bool champion = false;
+    float best_score = 0;
+
+    public TextMeshProUGUI scoreUI;
+    public TextMeshProUGUI epUI;
+    int death_counter = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -62,7 +78,11 @@ public class PlayerControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-	controls mv = new controls();
+        if (!aiMode) { 
+        scoreUI.text = "Best score: " + best_score.ToString("0");
+        epUI.text = "Death Counter: " + death_counter.ToString("0");
+        }
+        controls mv = new controls();
 	if(aiMode)
     {
             if (!Dead)
@@ -96,13 +116,42 @@ public class PlayerControl : MonoBehaviour
 
         Move(mv.direction);
 
+
         Jump(mv.jump);
 
         AmIDead();
 
         if (Dead)
         {
-            rigidbody.velocity = Vector2.zero;
+            death_counter++;
+            if (!aiMode)
+            {
+                float score = gameObject.transform.position.x;
+                if (score >= best_score)
+                {
+                    best_score = score;
+                }
+
+                gameObject.transform.position = GameObject.FindGameObjectWithTag("Respawn").transform.position;
+                Dead = false;
+                foreach (GameObject plat in GameObject.FindGameObjectsWithTag("platform"))
+                {
+                    Destroy(plat);
+                }
+
+                foreach (GameObject gap in GameObject.FindGameObjectsWithTag("gap"))
+                {
+                    Destroy(gap);
+                }
+                GameObject.FindGameObjectWithTag("_Scene").GetComponent<spawnPlatform>().Initialize();
+                GameObject.FindGameObjectWithTag("laser").GetComponent<Laser>().Initialize();
+                gameObject.GetComponent<SpriteRenderer>().enabled = true;
+                check_again = true;
+            }
+            else
+            {
+                rigidbody.velocity = Vector2.zero;
+            }
         }
         queue.Dequeue();
         queue.Enqueue(gameObject.transform.position.x);
@@ -111,6 +160,61 @@ public class PlayerControl : MonoBehaviour
     void Move(float dir)
     {
         float xinput = dir;
+        if (dir != 0)
+        {
+            if (!Grounded)
+            {
+                if (champion)
+                {
+                    gameObject.GetComponent<SpriteRenderer>().sprite = champion_jumping;
+
+                }
+                else
+                {
+                    gameObject.GetComponent<SpriteRenderer>().sprite = jumping;
+                }
+
+            }
+            else
+            {
+                if (champion)
+                {
+                    gameObject.GetComponent<SpriteRenderer>().sprite = champion_running;
+
+                }
+                else
+                {
+                    gameObject.GetComponent<SpriteRenderer>().sprite = running;
+                }
+            }
+        }
+        else
+        {
+            if (!Grounded)
+            {
+                if (champion)
+                {
+                    gameObject.GetComponent<SpriteRenderer>().sprite = champion_jumping;
+
+                }
+                else
+                {
+                    gameObject.GetComponent<SpriteRenderer>().sprite = jumping;
+                }
+            }
+            else
+            {
+                if (champion)
+                {
+                    gameObject.GetComponent<SpriteRenderer>().sprite = champion_standing;
+
+                }
+                else
+                {
+                    gameObject.GetComponent<SpriteRenderer>().sprite = standing;
+                }
+            }
+        }
         rigidbody.velocity = new Vector2(xinput * speed, rigidbody.velocity.y);
         if ((facingRight == false && xinput > 0) || (facingRight == true && xinput < 0))
         {
@@ -123,6 +227,7 @@ public class PlayerControl : MonoBehaviour
         if ( (jmp == 1) && Grounded)
         {
             rigidbody.velocity = Vector2.up * jumpForce;
+
         }
     }
 
@@ -135,8 +240,8 @@ public class PlayerControl : MonoBehaviour
     controls GetControls()
     {
         controls ret = new controls();
-        Vector<double> foo = gameObject.GetComponent<geneticAgent>().output;
-        //Vector<double> foo = gameObject.GetComponent<hillAgent>().output;
+        //Vector<double> foo = gameObject.GetComponent<geneticAgent>().output;
+        Vector<double> foo = gameObject.GetComponent<hillAgent>().output;
 
         if (foo[0]> 0.5)
         {
@@ -161,7 +266,7 @@ public class PlayerControl : MonoBehaviour
     {
         if (check_again)
         {
-            if (gameObject.transform.position.y <= deadBarrier)
+            if (gameObject.transform.position.y <= deadBarrier || gameObject.transform.position.x >= 1000)
             {
                 Dead = true;
             }

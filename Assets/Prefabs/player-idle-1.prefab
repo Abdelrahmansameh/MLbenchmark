@@ -172,6 +172,16 @@ MonoBehaviour:
   deadBarrier: -10
   stuck: 0
   queueSize: 0
+  check_again: 0
+  running: {fileID: 21300000, guid: dee4d6fd6adcd47c6b3eaf0667614a0f, type: 3}
+  standing: {fileID: 21300000, guid: 522d916af9f7944fc9739fa8abcde570, type: 3}
+  champion_running: {fileID: 21300000, guid: 3d72f484860663d4f83e7cd7e56caa30, type: 3}
+  champion_standing: {fileID: 21300000, guid: 49ab27db88f45544b83118c980c6dbe5, type: 3}
+  jumping: {fileID: 21300000, guid: 6750907b9c70e446aac2628e2f34cd38, type: 3}
+  champion_jumping: {fileID: 21300000, guid: 1841e2e6bff1d4944aecd2d699100c2d, type: 3}
+  champion: 0
+  scoreUI: {fileID: 0}
+  epUI: {fileID: 0}
 --- !u!50 &8153359907056128635
 Rigidbody2D:
   serializedVersion: 4
@@ -200,7 +210,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8153359907056128640}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 571a590989d7ebd488fe8c818e5ce840, type: 3}
   m_Name: 
@@ -218,26 +228,25 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8153359907056128640}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 16b42c87bd0fc46478d4c2525a36231a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  max_episode_length: 1000
-  num_episodes_per_test: 10
-  episode_counter: 0
-  R: 0
-  avg_R: 0
-  size_obs_space: 3
-  size_action_space: 2
-  step_counter: 0
-  test_counter: 0
-  test_success: 0
-  alpha_init: 0.1
-  alpha: 0.1
-  alpha_decay: 1
   spawnPoint: {fileID: 0}
+  n_episodes: 1000
+  max_t: 10000
+  gamma: 1
+  noise_scale: 0.001
+  size_action_space: 4
+  size_obs_space: 4
+  episode_counter: 0
+  step_counter: 0
+  last_positon: 0
   blockRadius: 0.5
+  max_stuck: 25
+  stuck_counter: 0
+  wait: 0
 --- !u!120 &1147002696263413479
 LineRenderer:
   m_ObjectHideFlags: 0

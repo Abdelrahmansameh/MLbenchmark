@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.LinearAlgebra;
@@ -35,8 +36,8 @@ public class Policy
     public Vector<double> predict(Vector<double> x)
     {
         // Feedforward prediction of Policy.
-        var a = x * this.W;
-        return Sigmoid(a);
+        var a =  this.W.Transpose() * x;
+        return Softmax(a);
     }
 
     public int act(Vector<double> x)
@@ -76,12 +77,21 @@ public class Policy
     {
         return 1 / (1 + (1 / W.PointwiseExp()));
     }
+
+    Vector<double> Softmax(Vector<double> W)
+    {
+        var c = W.Max();
+        var exp_a = W.Map(x => Math.Exp(x - c));
+        var sum_exp_a = exp_a.Sum();
+        return exp_a.Map(x => x / sum_exp_a);
+    }
 }
 
 
 public class hillAgent : MonoBehaviour
 {
     //Simple Hill Climbing Agent
+    public GameObject spawnPoint;
     public int n_episodes = 1000; // maximum number of training episodes
     public int max_t = 1000; // maximum number of timesteps per episode 
     public double gamma = 1.0;  // discount rate 
@@ -89,8 +99,9 @@ public class hillAgent : MonoBehaviour
     public int size_action_space;
     public int size_obs_space;
     public Vector<double> output;
-    int episode_counter;
-    int step_counter;
+    public int episode_counter;
+    public int step_counter;
+    public float last_positon;
 
     public float blockRadius = 0.5f;
     // for keeping a memory of the scores
@@ -98,15 +109,20 @@ public class hillAgent : MonoBehaviour
     List<double> score;
 
     double best_reward = double.NegativeInfinity;
-    Policy policy;
-    Matrix<double> best_policy_w;
+    public Policy policy;
+    public Matrix<double> best_policy_w;
 
     LineRenderer line;
     List<double> rewards;
-
-
+    public int max_stuck = 10;
+    public int stuck_counter = 0;
+    public bool wait;
     void Start()
     {
+        wait = false;
+
+
+        spawnPoint = GameObject.FindGameObjectWithTag("Respawn");
         policy = new Policy(size_obs_space, size_action_space);
         best_policy_w = policy.W;
         rewards = new List<double>();
@@ -118,67 +134,89 @@ public class hillAgent : MonoBehaviour
         line = gameObject.GetComponent<LineRenderer>();
         line.positionCount = 4;
         line.SetPosition(0, gameObject.transform.position);
-
+        last_positon = transform.position.x;
         episode_counter++;
     }
 
 
     void Update()
     {
-
-        if (episode_counter <= n_episodes)
+        line.SetPosition(0, gameObject.transform.position);
+        line.SetPosition(1, gameObject.transform.position);
+        line.SetPosition(2, gameObject.transform.position);
+        line.SetPosition(3, gameObject.transform.position);
+        if (!wait)
         {
-
-            if (!gameObject.GetComponent<PlayerControl>().Dead || step_counter <= max_t)
+            if (episode_counter <= n_episodes)
             {
-                int action = policy.act(state());
-                switch (action)
-                {
-                    case 0:
-                        output = Vector<double>.Build.DenseOfArray(new double[] { 0, 0 });
-                        break;
-                    case 1:
-                        output = Vector<double>.Build.DenseOfArray(new double[] { 1, 0 });
-                        break;
-                    case 2:
-                        output = Vector<double>.Build.DenseOfArray(new double[] { 1, 1 });
-                        break;
 
-                    case 3:
-                        output = Vector<double>.Build.DenseOfArray(new double[] { 0, 1 });
-                        break;
+                if (!gameObject.GetComponent<PlayerControl>().Dead) //&& step_counter <= max_t)
+                {
+                    int action = policy.act(state());
+                    switch (action)
+                    {
+                        case 0:
+                            output = Vector<double>.Build.DenseOfArray(new double[] { 0, 0 });
+                            break;
+                        case 1:
+                            output = Vector<double>.Build.DenseOfArray(new double[] { 1, 0 });
+                            break;
+                        case 2:
+                            output = Vector<double>.Build.DenseOfArray(new double[] { 1, 1 });
+                            break;
+
+                        case 3:
+                            output = Vector<double>.Build.DenseOfArray(new double[] { 0, 1 });
+                            break;
+                    }
+                    step_counter++;
+                    rewards.Add(transform.position.x);
+                    last_positon = transform.position.x;
                 }
-                step_counter++;
-                rewards.Add(transform.position.x);
+
+                else if (gameObject.GetComponent<PlayerControl>().Dead )//|| step_counter > max_t)
+                {
+                    //print(policy.W);
+                    double R = 0.0;
+                    int count = 1;
+                    foreach (var r in rewards)
+                    {
+                        R += r * Math.Pow(gamma, count);
+                        count++;
+                    }
+                    if (R > best_reward)
+                    {
+                        best_reward = R;
+                        //print(best_reward);
+                        policy.W.CopyTo(best_policy_w);
+                        noise_scale = Math.Max(Math.Pow(10, -3), noise_scale / 2);
+                        policy.W += noise_scale * Matrix<double>.Build.Random(policy.input_size, policy.output_size);
+                        stuck_counter = 0;
+
+                        //System.IO.File.WriteAllLines(filepath, lines);
+                    }
+                    else
+                    {
+                        noise_scale = Math.Min(2, noise_scale * 2);
+                        policy.W = best_policy_w + noise_scale * Matrix<double>.Build.Random(policy.input_size, policy.output_size);
+                        stuck_counter++;
+                    }
+                    if (stuck_counter > max_stuck)
+                    {
+                        policy.W = Matrix<double>.Build.Random(policy.input_size, policy.output_size);
+                        stuck_counter = 0;
+                    }
+
+                    last_positon = transform.position.x;
+                    rewards = new List<double>();
+                    step_counter = 0;
+                    episode_counter++;
+                    gameObject.GetComponent<PlayerControl>().Dead = true;
+                    gameObject.GetComponent<PlayerControl>().check_again = false;
+                    wait = true;
+                }
+
             }
-
-            else
-            {
-                double R = 0.0;
-                int count = 1;
-                foreach (var r in rewards)
-                {
-                    R += r * Math.Pow(gamma, count);
-                    count++;
-                }
-
-                if (R >= best_reward)
-                {
-                    best_reward = R;
-                    best_policy_w = policy.W;
-                    noise_scale = Math.Max(Math.Pow(10, -3), noise_scale / 2);
-                    policy.W += noise_scale * Matrix<double>.Build.Random(policy.input_size, policy.output_size);
-                }
-                else
-                {
-                    noise_scale = Math.Min(2, noise_scale * 2);
-                    policy.W = best_policy_w + noise_scale * Matrix<double>.Build.Random(policy.input_size, policy.output_size);
-                }
-                rewards = new List<double>();
-                step_counter = 0;
-                episode_counter++;
-            }
-
         }
     }
 
@@ -215,8 +253,10 @@ public class hillAgent : MonoBehaviour
         Vector<double> input = Vector<double>.Build.Dense(size_obs_space);
         input[0] = ba;
         input[1] = foo;
+        //input[2] = gameObject.GetComponent<PlayerControl>().Grounded ? 1 : 0;
         input[2] = gameObject.transform.position.y + 1.58532;
-
+        input[3] = 1;
+        //print(input);
         return input;
     }
 

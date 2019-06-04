@@ -13,6 +13,7 @@ public class Laser : MonoBehaviour
         rigidbody.velocity = new Vector2(speed, 0);
 
         Initialize();
+
     }
 
     public void Initialize()
@@ -20,10 +21,15 @@ public class Laser : MonoBehaviour
         Vector2 spawnpoint = new Vector2(GameObject.FindGameObjectWithTag("Respawn").transform.position.x - 20, gameObject.transform.position.y);
         //print(spawnpoint);
         gameObject.transform.position = spawnpoint;
+
+        //Color newColor = new Color(Random.value, Random.value, Random.value, 1.0f);
+
+//        gameObject.GetComponent<SpriteRenderer>().color = newColor;
+
     }
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }
