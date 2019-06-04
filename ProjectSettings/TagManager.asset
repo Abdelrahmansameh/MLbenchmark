@@ -10,6 +10,9 @@ TagManager:
   - laser
   - gap
   - groundBlock
+  - Respawn1
+  - Respawn2
+  - bullet
   layers:
   - Default
   - TransparentFX
